@@ -3,6 +3,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { supabase } from '../supabaseClient';
 import type { Exercise, WorkoutLog } from '../types';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import ExerciseFilter from '../components/ExerciseFilter';
 
 // Componente ProgressChart (sin cambios)
 const ProgressChart = ({ data }: { data: WorkoutLog[] }) => {
@@ -104,45 +105,24 @@ const KpiDashboard = () => {
         KPIs y Progreso
       </h1>
 
-      {/* --- SECCIÓN DE FILTROS Y SELECTOR --- */}
       <div className="bg-slate-900 border border-slate-800 p-4 rounded-xl mb-8 space-y-4">
-        <h3 className="font-bold text-slate-300">Analizar Ejercicio</h3>
-        {/* Filtro de Texto */}
-        <div>
-          <input
-            type="text"
-            value={filterText}
-            onChange={(e) => setFilterText(e.target.value)}
-            placeholder="Buscar por nombre..."
-            className="w-full rounded-lg border border-slate-700 bg-slate-800 px-4 py-2.5 text-sm text-slate-100 placeholder-slate-500 outline-none focus:border-emerald-500"
-          />
-        </div>
-        {/* Filtro de Sección */}
-        <div className="grid grid-cols-3 gap-2">
-            {(['All', 'Superior', 'Inferior'] as const).map(sec => (
-                <button
-                    key={sec}
-                    type="button"
-                    onClick={() => setFilterSection(sec)}
-                    className={`py-2 rounded-lg font-semibold text-xs border transition-colors ${filterSection === sec ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/40' : 'border-slate-700 hover:bg-slate-700/50'}`}
-                >
-                    {sec === 'All' ? 'Todos' : sec}
-                </button>
-            ))}
-        </div>
-        {/* Selector de Ejercicio */}
-        <div>
-            <select 
-              value={selectedExId} 
-              onChange={e => setSelectedExId(e.target.value)} 
-              className="w-full rounded-lg border border-slate-700 bg-slate-800 px-4 py-2.5 text-slate-100 outline-none focus:border-emerald-500"
-            >
-                <option value="">-- Selecciona de la lista ({filteredExercises.length}) --</option>
-                {/* AHORA MAPEAMOS SOBRE LA LISTA FILTRADA */}
-                {filteredExercises.map(ex => <option key={ex.id} value={ex.id}>{ex.name}</option>)}
-            </select>
-        </div>
-      </div>
+                <ExerciseFilter
+                    filterText={filterText}
+                    setFilterText={setFilterText}
+                    filterSection={filterSection}
+                    setFilterSection={setFilterSection}
+                />
+                 <div>
+                    <select 
+                      value={selectedExId} 
+                      onChange={e => setSelectedExId(e.target.value)} 
+                      className="w-full rounded-lg border border-slate-700 bg-slate-800 px-4 py-2.5 text-slate-100 outline-none focus:border-emerald-500"
+                    >
+                        <option value="">-- Selecciona de la lista ({filteredExercises.length}) --</option>
+                        {filteredExercises.map(ex => <option key={ex.id} value={ex.id}>{ex.name}</option>)}
+                    </select>
+                </div>
+            </div>
 
       {/* El resto del dashboard (KPIs, Gráfico, Historial) sin cambios */}
       {loading && selectedExId && <p className="text-center text-slate-400 py-8">Cargando datos...</p>}

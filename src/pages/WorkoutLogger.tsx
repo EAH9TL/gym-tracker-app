@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo } from 'react'; // Importamos useMemo
 import { supabase } from '../supabaseClient';
 import type { Exercise, WorkoutLogInsert } from '../types';
 import Swal from 'sweetalert2';
+import ExerciseFilter from '../components/ExerciseFilter';
 
 const WorkoutLogger = () => {
   const [exercises, setExercises] = useState<Exercise[]>([]);
@@ -75,29 +76,13 @@ const WorkoutLogger = () => {
         <h1 className="text-2xl font-bold mb-6 text-slate-200">Registrar Marca de Hoy</h1>
         <form onSubmit={handleSaveLog} className="bg-slate-900 border border-slate-800 p-4 sm:p-6 rounded-xl space-y-4">
              
-             {/* --- SECCIÓN DE FILTROS --- */}
-             <div className="space-y-3 p-3 bg-slate-800/30 rounded-lg">
-                <h3 className="text-sm font-semibold text-slate-400">Filtrar Ejercicio</h3>
-                <input
-                    type="text"
-                    value={filterText}
-                    onChange={(e) => setFilterText(e.target.value)}
-                    placeholder="Buscar por nombre..."
-                    className="w-full rounded-lg border border-slate-700 bg-slate-800 px-4 py-2 text-sm text-slate-100 placeholder-slate-500 outline-none focus:border-emerald-500"
-                />
-                <div className="grid grid-cols-3 gap-2">
-                    {(['All', 'Superior', 'Inferior'] as const).map(sec => (
-                        <button
-                            key={sec}
-                            type="button"
-                            onClick={() => setFilterSection(sec)}
-                            className={`py-2 rounded-lg font-semibold text-xs border transition-colors ${filterSection === sec ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/40' : 'border-slate-700 hover:bg-slate-700/50'}`}
-                        >
-                            {sec === 'All' ? 'Todos' : sec}
-                        </button>
-                    ))}
-                </div>
-             </div>
+            <ExerciseFilter 
+              filterText={filterText} 
+              setFilterText={setFilterText} 
+              filterSection={filterSection} 
+              setFilterSection={setFilterSection} 
+              itemCount={filteredExercises.length}
+            />
 
              <div>
                 <label className="block text-sm font-semibold mb-1 text-slate-300">Ejercicio ({filteredExercises.length} encontrados)</label>
