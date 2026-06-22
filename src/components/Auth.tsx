@@ -41,6 +41,7 @@ export default function Auth() {
             <label className="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1">Email</label>
             <input
               type="email"
+              inputMode='email'
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               className="w-full rounded-lg border border-slate-700 bg-slate-800 px-4 py-2 text-slate-100 placeholder-slate-500 outline-none focus:border-emerald-500"
@@ -55,7 +56,7 @@ export default function Auth() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               className="w-full rounded-lg border border-slate-700 bg-slate-800 px-4 py-2 text-slate-100 placeholder-slate-500 outline-none focus:border-emerald-500"
-              placeholder="••••••••"
+              placeholder="contraseña"
               required
             />
           </div>
