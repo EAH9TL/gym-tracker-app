@@ -10,8 +10,6 @@ const WorkoutLogger = () => {
   // Estados del formulario
   const [selectedExId, setSelectedExId] = useState<string>('');
   const [weight, setWeight] = useState<string>('');
-  const [setsReps, setSetsReps] = useState<string>('');
-  const [rir, setRir] = useState<string>('');
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
@@ -33,7 +31,7 @@ const WorkoutLogger = () => {
   
   const handleSaveLog = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!selectedExId || !weight || !setsReps || !rir) {
+    if (!selectedExId || !weight) {
         Swal.fire({ title: 'Campos incompletos', text: 'Por favor, rellena todos los datos de la serie.', icon: 'warning', background: '#1e293b', color: '#e2e8f0' });
         return;
     }
@@ -41,8 +39,6 @@ const WorkoutLogger = () => {
     const logToInsert: WorkoutLogInsert = {
         exercise_id: parseInt(selectedExId),
         weight_kg: parseFloat(weight),
-        sets_reps: setsReps,
-        rir: parseInt(rir)
     };
     const { error } = await supabase.from('workout_logs').insert([logToInsert]);
     setSaving(false);
@@ -54,8 +50,6 @@ const WorkoutLogger = () => {
         // Limpiar formulario
         setSelectedExId('');
         setWeight('');
-        setSetsReps('');
-        setRir('');
     }
   };
 
@@ -75,14 +69,6 @@ const WorkoutLogger = () => {
    <div>
        <label className="block text-sm font-semibold mb-1 text-slate-300">Peso (kg)</label>
        <input type="number" step="any" value={weight} onChange={e => setWeight(e.target.value)} placeholder="60.5" className="w-full rounded-lg border border-slate-700 bg-slate-800 px-4 py-2.5 text-slate-100 outline-none focus:border-emerald-500"/>
-   </div>
-    <div>
-       <label className="block text-sm font-semibold mb-1 text-slate-300">Sets x Reps</label>
-       <input type="text" value={setsReps} onChange={e => setSetsReps(e.target.value)} placeholder="3x10" className="w-full rounded-lg border border-slate-700 bg-slate-800 px-4 py-2.5 text-slate-100 outline-none focus:border-emerald-500"/>
-   </div>
-    <div>
-       <label className="block text-sm font-semibold mb-1 text-slate-300">RIR</label>
-       <input type="number" value={rir} onChange={e => setRir(e.target.value)} placeholder="2" className="w-full rounded-lg border border-slate-700 bg-slate-800 px-4 py-2.5 text-slate-100 outline-none focus:border-emerald-500"/>
    </div>
 </div>
              <button type="submit" disabled={saving} className="w-full rounded-lg bg-emerald-500 py-3 font-bold text-slate-950 transition hover:bg-emerald-400 disabled:opacity-50">
