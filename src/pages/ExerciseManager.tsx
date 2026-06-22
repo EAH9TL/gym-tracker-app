@@ -206,7 +206,7 @@ const ExerciseManager = () => {
         </div>
         <div>
             <label className="block text-sm font-semibold mb-1.5 text-slate-300">RIR Objetivo</label>
-            <input type="number" value={rir} onChange={e => setRir(e.target.value)} placeholder="Ej. 2" className="w-full rounded-lg border border-slate-700 bg-slate-800 px-4 py-2.5"/>
+            <input type="number" inputMode='numeric' value={rir} onChange={e => setRir(e.target.value)} placeholder="Ej. 2" className="w-full rounded-lg border border-slate-700 bg-slate-800 px-4 py-2.5"/>
         </div>
     </div>
     

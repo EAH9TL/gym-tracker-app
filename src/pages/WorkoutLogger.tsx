@@ -107,7 +107,7 @@ const WorkoutLogger = () => {
 
              <div>
                 <label className="block text-sm font-semibold mb-1 text-slate-300">Peso Levantado (kg)</label>
-                <input type="number" inputMode='numeric' step="0.5" value={weight} onChange={e => setWeight(e.target.value)} placeholder="Introduce el peso de hoy" className="w-full rounded-lg border border-slate-700 bg-slate-800 px-4 py-2.5 text-center text-lg font-bold text-slate-100 outline-none focus:border-emerald-500"/>
+                <input type="number" inputMode='decimal' step="0.5" value={weight} onChange={e => setWeight(e.target.value)} placeholder="Introduce el peso de hoy" className="w-full rounded-lg border border-slate-700 bg-slate-800 px-4 py-2.5 text-center text-lg font-bold text-slate-100 outline-none focus:border-emerald-500"/>
              </div>
 
              <button type="submit" disabled={saving || !selectedExId} className="w-full rounded-lg bg-emerald-500 py-3 font-bold text-slate-950 transition hover:bg-emerald-400 disabled:opacity-50 active:scale-95">

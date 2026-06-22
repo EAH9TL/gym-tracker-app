@@ -30,7 +30,7 @@ const ExerciseFilter: React.FC<ExerciseFilterProps> = ({
       {/* Filtro de Texto */}
       <div>
         <input
-          type="text"
+          type="search"
           value={filterText}
           onChange={(e) => setFilterText(e.target.value)}
           placeholder="Buscar por nombre..."
