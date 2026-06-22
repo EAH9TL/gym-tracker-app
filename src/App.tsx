@@ -4,6 +4,7 @@ import Layout from './components/Layout';
 import WorkoutLogger from './pages/WorkoutLogger';
 import KpiDashboard from './pages/KpiDashboard';
 import ExerciseManager from './pages/ExerciseManager';
+import ProfilePage from './pages/ProfilePage';
 
 function App() {
   return (
@@ -12,6 +13,7 @@ function App() {
         <Route index element={<WorkoutLogger />} />
         <Route path="kpis" element={<KpiDashboard />} />
         <Route path="exercises" element={<ExerciseManager />} />
+        <Route path="profile" element={<ProfilePage/>} />
       </Route>
     </Routes>
   );
