@@ -16,6 +16,9 @@ const ChartIcon = (props: React.SVGProps<SVGSVGElement>) => (
 const ListIcon = (props: React.SVGProps<SVGSVGElement>) => (
     <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="8" x2="21" y1="6" y2="6" /><line x1="8" x2="21" y1="12" y2="12" /><line x1="8" x2="21" y1="18" y2="18" /><line x1="3" x2="3.01" y1="6" y2="6" /><line x1="3" x2="3.01" y1="12" y2="12" /><line x1="3" x2="3.01" y1="18" y2="18" /></svg>
 );
+const UserIcon = (props: React.SVGProps<SVGSVGElement>) => (
+    <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" /><circle cx="12" cy="7" r="4" /></svg>
+);
 
 // --- Componente de Botón de Navegación reutilizable ---
 // MODIFICADO para uso en móvil (columna) y escritorio (fila)
@@ -81,7 +84,6 @@ const Layout = () => {
         <nav className="container mx-auto px-4 py-2 flex justify-between items-center">
             <div className="flex items-center gap-8">
               <span className="text-xl font-bold text-emerald-400">Gym Tracker 🏋️‍♂️</span>
-              {/* NAVEGACIÓN DE ESCRITORIO AHORA USA EL COMPONENTE NavItem */}
               <div className="flex items-center gap-2">
                 <NavItem to="/" icon={DumbbellIcon}>Registrar</NavItem>
                 <NavItem to="/kpis" icon={ChartIcon}>Progreso</NavItem>
@@ -90,16 +92,16 @@ const Layout = () => {
                 )}
               </div>
             </div>
+            {/* EL BOTÓN DE LOGOUT SE VA, AHORA TENEMOS EL DE PERFIL */}
             <div className="flex items-center gap-4">
-              <span className="text-xs text-slate-500">{session.user.email}</span>
-              <button onClick={() => supabase.auth.signOut()} className="bg-rose-500/10 text-rose-400 text-xs font-extrabold px-4 py-2 rounded-lg hover:bg-rose-500/20 active:scale-95 transition">Salir</button>
+                <NavItem to="/profile" icon={UserIcon}>Mi Cuenta</NavItem>
             </div>
         </nav>
       </header>
 
       {/* Área de Contenido Principal (sin cambios) */}
       <main className="container mx-auto px-4 py-6 md:py-8 max-w-3xl">
-        <Outlet context={{ profile }} />
+        <Outlet context={{ profile, session }} />
       </main>
 
       {/* --- BARRA DE NAVEGACIÓN INFERIOR PARA MÓVIL (sin cambios) --- */}
@@ -107,9 +109,13 @@ const Layout = () => {
           <div className="flex justify-around items-center h-full">
             <NavItem to="/" icon={DumbbellIcon} isMobile={true}>Registrar</NavItem>
             <NavItem to="/kpis" icon={ChartIcon} isMobile={true}>Progreso</NavItem>
-            {profile?.is_admin && (
+            {/* El botón de admin solo aparece si es admin, dejando espacio para el de perfil */}
+            {profile?.is_admin ? (
                 <NavItem to="/exercises" icon={ListIcon} isMobile={true}>Ejercicios</NavItem>
+            ) : (
+                <div className="w-full h-full"></div> // Un div vacío para mantener la distribución si no es admin
             )}
+            <NavItem to="/profile" icon={UserIcon} isMobile={true}>Cuenta</NavItem>
           </div>
       </nav>
     </div>
