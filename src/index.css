@@ -1,0 +1,8 @@
+@import "tailwindcss";
+
+/* El fondo oscuro personalizado para tu Gym Tracker */
+body {
+  background-color: rgb(2 6 23); /* bg-slate-950 */
+  color: rgb(241 245 249);       /* text-slate-100 */
+  min-height: 100vh;
+}
