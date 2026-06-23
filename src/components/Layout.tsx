@@ -28,7 +28,7 @@ const NavItem = ({ to, icon: Icon, children, isMobile = false }: { to: string; i
     const activeClasses = "text-emerald-400";
     const inactiveClasses = "text-slate-500 hover:text-slate-300";
 
-    const mobileLayout = "flex flex-col items-center justify-center gap-1 w-full h-full";
+    const mobileLayout = "flex-1 flex flex-col items-center justify-center gap-1 h-full";
     const desktopLayout = "flex items-center gap-2 text-sm font-bold p-2 rounded-lg";
     
     return (
@@ -105,19 +105,16 @@ const Layout = () => {
       </main>
 
       {/* --- BARRA DE NAVEGACIÓN INFERIOR PARA MÓVIL (sin cambios) --- */}
-      <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-slate-900/80 border-t border-slate-800 backdrop-blur-md z-50 h-16">
-          <div className="flex justify-around items-center h-full">
-            <NavItem to="/" icon={DumbbellIcon} isMobile={true}>Registrar</NavItem>
-            <NavItem to="/kpis" icon={ChartIcon} isMobile={true}>Progreso</NavItem>
-            {/* El botón de admin solo aparece si es admin, dejando espacio para el de perfil */}
-            {profile?.is_admin ? (
-                <NavItem to="/exercises" icon={ListIcon} isMobile={true}>Ejercicios</NavItem>
-            ) : (
-                <div className="w-full h-full"></div> // Un div vacío para mantener la distribución si no es admin
-            )}
-            <NavItem to="/profile" icon={UserIcon} isMobile={true}>Cuenta</NavItem>
+        <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-slate-900/80 border-t border-slate-800 backdrop-blur-md z-50 h-16">
+          <div className="flex items-center h-full">
+          <NavItem to="/" icon={DumbbellIcon} isMobile={true}>Registrar</NavItem>
+          <NavItem to="/kpis" icon={ChartIcon} isMobile={true}>Progreso</NavItem>
+          {profile?.is_admin && (
+            <NavItem to="/exercises" icon={ListIcon} isMobile={true}>Ejercicios</NavItem>
+          )}
+          <NavItem to="/profile" icon={UserIcon} isMobile={true}>Cuenta</NavItem>
           </div>
-      </nav>
+        </nav>
     </div>
   );
 };

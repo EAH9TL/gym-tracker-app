@@ -4,6 +4,7 @@ import { supabase } from '../supabaseClient';
 import type { Exercise, WorkoutLog } from '../types';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import ExerciseFilter from '../components/ExerciseFilter';
+import Swal from 'sweetalert2';
 
 // Componente ProgressChart (sin cambios)
 const ProgressChart = ({ data }: { data: WorkoutLog[] }) => {
@@ -35,6 +36,11 @@ const KpiDashboard = () => {
   const [selectedExId, setSelectedExId] = useState<string>('');
   const [history, setHistory] = useState<WorkoutLog[]>([]);
   const [loading, setLoading] = useState(true);
+  // Modal para editar un registro
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editingLog, setEditingLog] = useState<WorkoutLog | null>(null);
+  const [modalWeight, setModalWeight] = useState('');
+  const [isSavingEdit, setIsSavingEdit] = useState(false);
 
   // --- NUEVOS ESTADOS PARA LOS FILTROS ---
   const [filterText, setFilterText] = useState('');
@@ -98,6 +104,34 @@ const KpiDashboard = () => {
     return ((kpis.lastWeight - kpis.firstWeight) / kpis.firstWeight) * 100;
   }, [kpis]);
 
+  // Modal handlers
+  const closeModal = () => {
+    setIsModalOpen(false);
+    setEditingLog(null);
+    setModalWeight('');
+    setIsSavingEdit(false);
+  };
+
+  const handleSaveEdit = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+    if (!editingLog) return;
+    const parsed = parseFloat(modalWeight);
+    if (Number.isNaN(parsed)) {
+      Swal.fire({ title: 'Valor inválido', text: 'Introduce un número válido', icon: 'error', background: '#1e293b', color: '#e2e8f0' });
+      return;
+    }
+    setIsSavingEdit(true);
+    const { error } = await supabase.from('workout_logs').update({ weight_kg: parsed }).eq('id', editingLog.id);
+    setIsSavingEdit(false);
+    if (error) {
+      Swal.fire({ title: 'Error', text: error.message, icon: 'error', background: '#1e293b', color: '#e2e8f0' });
+    } else {
+      setHistory(prev => prev.map(h => h.id === editingLog.id ? { ...h, weight_kg: parsed } : h));
+      Swal.fire({ title: 'Actualizado', icon: 'success', timer: 1100, showConfirmButton: false, background: '#1e293b', color: '#e2e8f0' });
+      closeModal();
+    }
+  };
+
 
   return (
     <div className="max-w-4xl mx-auto">
@@ -152,8 +186,17 @@ const KpiDashboard = () => {
                   <div className="space-y-1">
                       {history.map(log => (
                           <div key={log.id} className="flex justify-between items-center bg-slate-800/40 p-3.5 rounded-lg border border-transparent hover:border-slate-700 transition-colors">
-                              <span className="font-semibold text-slate-400 text-sm">{new Date(log.created_at).toLocaleDateString()}</span>
-                              <span className="font-black text-lg text-slate-200">{log.weight_kg} kg</span>
+                              <div>
+                                <span className="font-semibold text-slate-400 text-sm block">{new Date(log.created_at).toLocaleDateString()}</span>
+                                <span className="font-black text-lg text-slate-200">{log.weight_kg} kg</span>
+                              </div>
+                              <div className="flex items-center gap-2">
+                                <button onClick={() => {
+                                    setEditingLog(log);
+                                    setModalWeight(String(log.weight_kg));
+                                    setIsModalOpen(true);
+                                }} className="text-slate-300 bg-slate-800/30 hover:bg-slate-700 px-3 py-1 rounded-md text-sm">Editar</button>
+                              </div>
                           </div>
                       ))}
                   </div>
@@ -161,6 +204,34 @@ const KpiDashboard = () => {
             </div>
           </div>
         )
+      )}
+      {/* Modal Tailwind para editar registro */}
+      {isModalOpen && (
+        <div 
+            onClick={closeModal}
+            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+        >
+          <div onClick={(e) => e.stopPropagation()} className="bg-slate-900 border border-slate-700 rounded-2xl p-6 w-full max-w-md">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-lg font-bold">✏️ Editar Registro</h2>
+              <button onClick={closeModal} className="text-slate-500 hover:text-white">&times;</button>
+            </div>
+            <form onSubmit={handleSaveEdit} className="space-y-4">
+              <div>
+                <label className="block text-sm font-semibold mb-1 text-slate-300">Fecha</label>
+                <input type="text" value={editingLog ? new Date(editingLog.created_at).toLocaleString() : ''} disabled className="w-full rounded-lg border border-slate-700 bg-slate-800 px-4 py-2.5 text-slate-400"/>
+              </div>
+              <div>
+                <label className="block text-sm font-semibold mb-1 text-slate-300">Peso (kg)</label>
+                <input type="number" inputMode='decimal' step="0.5" value={modalWeight} onChange={e => setModalWeight(e.target.value)} placeholder="Introduce el peso" className="w-full rounded-lg border border-slate-700 bg-slate-800 px-4 py-2.5"/>
+              </div>
+              <div className="flex gap-2">
+                <button type="submit" disabled={isSavingEdit} className="flex-1 rounded-lg bg-emerald-500 py-2 font-bold text-slate-950">{isSavingEdit ? 'Guardando...' : 'Guardar'}</button>
+                <button type="button" onClick={closeModal} className="flex-1 rounded-lg bg-slate-800 py-2 font-semibold text-slate-300 border border-slate-700">Cancelar</button>
+              </div>
+            </form>
+          </div>
+        </div>
       )}
     </div>
   );
