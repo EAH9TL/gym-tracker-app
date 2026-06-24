@@ -76,8 +76,15 @@ const Layout = () => {
   }
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-200 pb-20 md:pb-0">
-      
+    <div className="min-h-screen bg-slate-950 text-slate-200 pt-16 md:pt-0 pb-20 md:pb-0">
+      {/* --- 1. HEADER MINIMALISTA PARA MÓVIL --- */}
+      <header className="md:hidden fixed top-0 left-0 right-0 bg-slate-900/80 border-b border-slate-800 backdrop-blur-md z-50">
+        <div className="container mx-auto px-4 h-14 flex items-center justify-center">
+            <span className="text-lg font-bold text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-teal-500">
+                Gym Tracker 🏋️‍♂️
+            </span>
+        </div>
+      </header>
       {/* --- HEADER DE ESCRITORIO UNIFICADO --- */}
       <header className="hidden md:block bg-slate-900/80 border-b border-slate-800 backdrop-blur-md sticky top-0 z-50">
         <nav className="container mx-auto px-4 py-2 flex justify-between items-center">
