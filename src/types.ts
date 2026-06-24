@@ -19,14 +19,14 @@ export interface Exercise {
 
 export type ExerciseInsert = Omit<Exercise, 'id' | 'created_at' | 'user_id'>;
 
-
-// --- INTERFAZ DE WORKOUTLOG SIMPLIFICADA ---
+export type Difficulty = 'Fácil' | 'Medio' | 'Difícil';
 export interface WorkoutLog {
   id: number;
   created_at: string;
   exercise_id: number;
   weight_kg: number; // Ahora solo guardamos el peso
   user_id: string;
+  difficulty?: Difficulty | null;
 }
 
 export type WorkoutLogInsert = Omit<WorkoutLog, 'id' | 'created_at' | 'user_id'>;

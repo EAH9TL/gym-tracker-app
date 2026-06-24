@@ -1,7 +1,7 @@
 // src/pages/WorkoutLogger.tsx
 import { useState, useEffect, useMemo } from 'react';
 import { supabase } from '../supabaseClient';
-import type { Exercise, WorkoutLogInsert } from '../types';
+import type { Exercise, WorkoutLogInsert, Difficulty } from '../types';
 import Swal from 'sweetalert2';
 import ExerciseFilter from '../components/ExerciseFilter';
 
@@ -12,11 +12,12 @@ const WorkoutLogger = () => {
   // Estados del formulario
   const [selectedExId, setSelectedExId] = useState<string>('');
   const [weight, setWeight] = useState<string>('');
+  const [difficulty, setDifficulty] = useState<Difficulty | null>(null);
   const [saving, setSaving] = useState(false);
 
-  // --- NUEVOS ESTADOS PARA MOSTRAR EL ÚLTIMO PESO ---
-  const [lastWeight, setLastWeight] = useState<number | null>(null);
-  const [loadingLastWeight, setLoadingLastWeight] = useState(false);
+// Estados para el último peso y su dificultad
+  const [lastLog, setLastLog] = useState<{ weight: number; difficulty: Difficulty | null } | null>(null);
+  const [loadingLastLog, setLoadingLastLog] = useState(false);
 
   // Estados de los filtros
   const [filterText, setFilterText] = useState('');
@@ -33,38 +34,35 @@ const WorkoutLogger = () => {
     fetchExercises();
   }, []);
 
-  // --- NUEVO EFFECT PARA BUSCAR EL ÚLTIMO PESO ---
-  // Se dispara cada vez que cambia el ejercicio seleccionado
+// Effect para buscar el último registro (peso Y dificultad)
   useEffect(() => {
-    // Si no hay un ejercicio seleccionado, reseteamos el estado y no hacemos nada
     if (!selectedExId) {
       // eslint-disable-next-line react-hooks/set-state-in-effect
-      setLastWeight(null);
+      setLastLog(null);
       return;
     }
 
-    const fetchLastWeight = async () => {
-      setLoadingLastWeight(true);
-      setLastWeight(null); // Limpiamos el peso anterior mientras carga
+    const fetchLastLog = async () => {
+      setLoadingLastLog(true);
+      setLastLog(null);
 
       const { data } = await supabase
         .from('workout_logs')
-        .select('weight_kg') // Solo necesitamos la columna del peso
-        .eq('exercise_id', selectedExId) // Del ejercicio seleccionado
-        .order('created_at', { ascending: false }) // Ordenamos por fecha, el más reciente primero
-        .limit(1) // Solo queremos el primer resultado (el más reciente)
-        .single(); // Obtenemos un solo objeto en lugar de un array
+        .select('weight_kg, difficulty') // <-- AHORA PEDIMOS AMBOS CAMPOS
+        .eq('exercise_id', selectedExId)
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .single();
 
       if (data) {
-        setLastWeight(data.weight_kg);
+        setLastLog({ weight: data.weight_kg, difficulty: data.difficulty as Difficulty | null });
       }
-      // Si hay un error o no hay datos, lastWeight se quedará en null
       
-      setLoadingLastWeight(false);
+      setLoadingLastLog(false);
     };
 
-    fetchLastWeight();
-  }, [selectedExId]); // La dependencia es el ID del ejercicio seleccionado
+    fetchLastLog();
+  }, [selectedExId]);
 
 
   // Lógica de filtrado (sin cambios)
@@ -80,14 +78,15 @@ const WorkoutLogger = () => {
 
   const handleSaveLog = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!selectedExId || !weight) {
-        Swal.fire({ title: 'Campos incompletos', /* ... */ });
+    if (!selectedExId || !weight || !difficulty) {
+        Swal.fire({ title: 'Campos incompletos', text: 'Selecciona ejercicio, peso y dificultad.', icon: 'warning', background: '#1e293b', color: '#e2e8f0' });
         return;
     }
     setSaving(true);
     const logToInsert: WorkoutLogInsert = {
         exercise_id: parseInt(selectedExId),
         weight_kg: parseFloat(weight),
+        difficulty: difficulty,
     };
     const { error } = await supabase.from('workout_logs').insert([logToInsert]);
     setSaving(false);
@@ -95,12 +94,19 @@ const WorkoutLogger = () => {
     if (error) {
         Swal.fire({ title: 'Error', /* ... */ });
     } else {
-        Swal.fire({ title: '¡Guardado!', /* ... */ });
+        Swal.fire({ title: '¡Guardado!', text: 'Tu marca ha sido registrada.', icon: 'success', timer: 1500, showConfirmButton: false, background: '#1e293b', color: '#e2e8f0' });
         setWeight('');
-        // --- ACTUALIZAMOS EL ÚLTIMO PESO EN LA UI ---
-        // Para que se refleje inmediatamente sin necesidad de volver a seleccionar
-        setLastWeight(parseFloat(weight));
+        setDifficulty(null); // Reseteamos los botones de dificultad
+        // Actualizamos el último log en la UI
+        setLastLog({ weight: parseFloat(weight), difficulty: difficulty });
     }
+  };
+
+  // --- Objeto para mapear colores, facilita el renderizado ---
+  const difficultyStyles: Record<Difficulty, string> = {
+    Fácil: 'bg-green-500/10 text-green-400 border-green-500/30',
+    Medio: 'bg-yellow-500/10 text-yellow-400 border-yellow-500/30',
+    Difícil: 'bg-red-500/10 text-red-400 border-red-500/30',
   };
 
   return (
@@ -129,18 +135,48 @@ const WorkoutLogger = () => {
               </select>
             </div>
             
-            {/* --- SECCIÓN DE INFORMACIÓN DEL EJERCICIO ACTUALIZADA --- */}
+            {/* --- SECCIÓN DE INFORMACIÓN DEL EJERCICIO CON GRID 2x2 --- */}
             {selectedExercise && (
-                <div className="bg-slate-800/50 p-3 rounded-lg text-sm text-center grid grid-cols-2 md:grid-cols-3 gap-2">
-                    <p>Series x Reps: <span className="font-bold text-emerald-400">{selectedExercise.sets_reps || 'N/A'}</span></p>
-                    <p>RIR Objetivo: <span className="font-bold text-emerald-400">{selectedExercise.rir ?? 'N/A'}</span></p>
-                    {/* Nuevo indicador de último peso */}
-                    <div className="col-span-2 md:col-span-1 mt-2 md:mt-0 pt-2 md:pt-0 border-t border-slate-700/50 md:border-none">
-                        {loadingLastWeight ? (
-                            <p className="text-slate-400 animate-pulse">Buscando...</p>
-                        ) : (
-                            <p>Último Peso: <span className="font-bold text-amber-400">{lastWeight !== null ? `${lastWeight} kg` : 'N/A'}</span></p>
-                        )}
+                <div className="bg-slate-800/50 p-4 rounded-lg text-sm">
+                    <div className="grid grid-cols-2 grid-rows-2 gap-x-4 gap-y-3">
+                        {/* Fila 1, Columna 1: Series x Reps */}
+                        <div className="text-center border-r border-slate-700/50 pr-2">
+                            <p className="text-xs text-slate-400">Series x Reps</p>
+                            <p className="font-bold text-emerald-400">{selectedExercise.sets_reps || 'N/A'}</p>
+                        </div>
+                        {/* Fila 1, Columna 2: RIR Objetivo */}
+                        <div className="text-center">
+                            <p className="text-xs text-slate-400">RIR Objetivo</p>
+                            <p className="font-bold text-emerald-400">{selectedExercise.rir ?? 'N/A'}</p>
+                        </div>
+                        {/* Fila 2, Columna 1: Último Peso */}
+                        <div className="text-center border-r border-slate-700/50 pr-2 pt-2 border-t border-slate-700/50">
+                             {loadingLastLog ? (
+                                <p className="text-slate-400 animate-pulse text-xs">Buscando...</p>
+                            ) : (
+                                <>
+                                    <p className="text-xs text-slate-400">Último Peso</p>
+                                    <p className="font-bold text-amber-400">{lastLog ? `${lastLog.weight} kg` : 'N/A'}</p>
+                                </>
+                            )}
+                        </div>
+                        {/* Fila 2, Columna 2: Última Dificultad */}
+                        <div className="text-center pt-2 border-t border-slate-700/50">
+                             {loadingLastLog ? (
+                                <p className="text-slate-400 animate-pulse text-xs">...</p>
+                            ) : (
+                                <>
+                                    <p className="text-xs text-slate-400">Dificultad Último Peso</p>
+                                    {lastLog?.difficulty ? (
+                                        <span className={`font-semibold px-2 py-0.5 rounded-full text-xs ${difficultyStyles[lastLog.difficulty]}`}>
+                                            {lastLog.difficulty}
+                                        </span>
+                                    ) : (
+                                        <p className="font-bold text-slate-500">N/A</p>
+                                    )}
+                                </>
+                            )}
+                        </div>
                     </div>
                 </div>
             )}
@@ -148,6 +184,27 @@ const WorkoutLogger = () => {
             <div>
               <label className="block text-sm font-semibold mb-1 text-slate-300">Peso Levantado (kg)</label>
               <input type="number" inputMode='decimal' step="0.5" value={weight} onChange={e => setWeight(e.target.value)} placeholder="Introduce el peso de hoy" className="w-full rounded-lg border border-slate-700 bg-slate-800 px-4 py-2.5 text-center text-lg font-bold text-slate-100 outline-none focus:border-emerald-500"/>
+            </div>
+
+            {/* --- NUEVA SECCIÓN PARA SELECCIONAR DIFICULTAD --- */}
+            <div>
+                <label className="block text-sm font-semibold mb-2 text-slate-300">¿Cómo se sintió el peso?</label>
+                <div className="grid grid-cols-3 gap-2">
+                    {(['Fácil', 'Medio', 'Difícil'] as Difficulty[]).map(d => (
+                        <button
+                            key={d}
+                            type="button"
+                            onClick={() => setDifficulty(d)}
+                            className={`py-2.5 rounded-lg font-semibold text-sm border transition-all ${
+                                difficulty === d 
+                                ? `${difficultyStyles[d]} scale-105`
+                                : 'border-slate-700 hover:bg-slate-800/50'
+                            }`}
+                        >
+                            {d}
+                        </button>
+                    ))}
+                </div>
             </div>
 
             <button type="submit" disabled={saving || !selectedExId} className="w-full rounded-lg bg-emerald-500 py-3 font-bold text-slate-950 transition hover:bg-emerald-400 disabled:opacity-50 active:scale-95">
