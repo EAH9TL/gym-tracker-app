@@ -78,7 +78,7 @@ const EditLogModal: React.FC<EditLogModalProps> = ({ log, onClose, onSave }) => 
         <form onSubmit={handleSave} className="space-y-4">
           <div>
             <label className="block text-sm font-semibold mb-1.5 text-slate-300">Peso (kg)</label>
-            <input type="number" step="0.5" value={weight} onChange={e => setWeight(e.target.value)} className="w-full rounded-lg border border-slate-700 bg-slate-800 px-4 py-2.5 text-center text-lg font-bold"/>
+            <input type="number" inputMode='decimal' step="0.5" value={weight} onChange={e => setWeight(e.target.value)} className="w-full rounded-lg border border-slate-700 bg-slate-800 px-4 py-2.5 text-center text-lg font-bold"/>
           </div>
           <div>
             <label className="block text-sm font-semibold mb-2 text-slate-300">Dificultad</label>
