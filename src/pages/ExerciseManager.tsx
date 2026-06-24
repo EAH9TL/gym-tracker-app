@@ -1,13 +1,10 @@
-// src/pages/ExerciseManager.tsx
 import { useState, useEffect, useMemo } from 'react';
-import { useOutletContext } from 'react-router';
 import { supabase } from '../supabaseClient';
-import type { Profile, Exercise, ExerciseInsert } from '../types';
+import type { Exercise, ExerciseInsert } from '../types';
 import Swal from 'sweetalert2';
 import ExerciseFilter from '../components/ExerciseFilter';
 
 const ExerciseManager = () => {
-  const { profile } = useOutletContext<{ profile: Profile | null }>();
 
   // Estados de datos y UI
   const [exercises, setExercises] = useState<Exercise[]>([]);
@@ -57,8 +54,6 @@ const ExerciseManager = () => {
 
   const handleSaveExercise = async (e: React.FormEvent) => {
     e.preventDefault();
-    // ... (resto de la lógica de guardado sin cambios)
-    if (!profile?.is_admin) return;
     if (!name.trim()) {
       Swal.fire({ title: 'Inválido', text: 'El nombre es obligatorio.', icon: 'warning', background: '#1e293b', color: '#e2e8f0' });
       return;
@@ -127,14 +122,12 @@ const ExerciseManager = () => {
           Catálogo de Ejercicios
         </h1>
         {/* BOTÓN PARA ABRIR EL MODAL DE CREACIÓN */}
-        {profile?.is_admin && (
           <button
             onClick={handleCreateNew}
             className="w-full sm:w-auto bg-emerald-500 text-slate-950 font-bold py-2 px-4 rounded-lg transition hover:bg-emerald-400 active:scale-95 text-sm"
           >
             ➕ Crear Nuevo Ejercicio
           </button>
-        )}
       </div>
 
       <ExerciseFilter
@@ -159,11 +152,9 @@ const ExerciseManager = () => {
                     {ex.notes && <span className="ml-2 italic">“{ex.notes}”</span>}
                 </p>
               </div>
-              {profile?.is_admin && (
                 <button onClick={() => handleEdit(ex)} className="w-full sm:w-auto text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold px-4 py-2 rounded-md transition-colors border border-slate-700 sm:border-transparent mt-2 sm:mt-0">
                   Editar
                 </button>
-              )}
             </div>
           ))
         )}

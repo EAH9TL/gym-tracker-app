@@ -12,12 +12,12 @@ export interface Exercise {
   name: string;
   body_section: 'Superior' | 'Inferior';
   notes?: string;
-  // Nuevos campos
   sets_reps?: string | null;
   rir?: number | null;
+  user_id: string;
 }
 
-export type ExerciseInsert = Omit<Exercise, 'id' | 'created_at'>;
+export type ExerciseInsert = Omit<Exercise, 'id' | 'created_at' | 'user_id'>;
 
 
 // --- INTERFAZ DE WORKOUTLOG SIMPLIFICADA ---

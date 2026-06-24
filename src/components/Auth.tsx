@@ -19,7 +19,7 @@ export default function Auth() {
       if (error) {
         setMessage('Error de registro: ' + error.message);
       } else {
-        setMessage('¡Registro exitoso! Por favor inicia sesión.');
+        setMessage('¡Registro exitoso! Por favor confirma tu email e inicia sesión.');
         setIsRegistering(false);
       }
     } else {

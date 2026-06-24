@@ -49,7 +49,6 @@ const Layout = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // ... (lógica de sesión sin cambios)
      const fetchSessionAndProfile = async () => {
         const { data: { session } } = await supabase.auth.getSession();
         setSession(session);
@@ -87,9 +86,7 @@ const Layout = () => {
               <div className="flex items-center gap-2">
                 <NavItem to="/" icon={DumbbellIcon}>Registrar</NavItem>
                 <NavItem to="/kpis" icon={ChartIcon}>Progreso</NavItem>
-                {profile?.is_admin && (
-                  <NavItem to="/exercises" icon={ListIcon}>Ejercicios</NavItem>
-                )}
+                <NavItem to="/exercises" icon={ListIcon}>Ejercicios</NavItem>
               </div>
             </div>
             {/* EL BOTÓN DE LOGOUT SE VA, AHORA TENEMOS EL DE PERFIL */}
@@ -109,9 +106,7 @@ const Layout = () => {
           <div className="flex items-center h-full">
           <NavItem to="/" icon={DumbbellIcon} isMobile={true}>Registrar</NavItem>
           <NavItem to="/kpis" icon={ChartIcon} isMobile={true}>Progreso</NavItem>
-          {profile?.is_admin && (
-            <NavItem to="/exercises" icon={ListIcon} isMobile={true}>Ejercicios</NavItem>
-          )}
+          <NavItem to="/exercises" icon={ListIcon} isMobile={true}>Ejercicios</NavItem>
           <NavItem to="/profile" icon={UserIcon} isMobile={true}>Cuenta</NavItem>
           </div>
         </nav>
