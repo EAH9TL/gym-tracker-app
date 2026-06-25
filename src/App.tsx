@@ -13,7 +13,7 @@ function App() {
         <Route index element={<WorkoutLogger />} />
         <Route path="kpis" element={<KpiDashboard />} />
         <Route path="exercises" element={<ExerciseManager />} />
-        <Route path="profile" element={<ProfilePage/>} />
+        <Route path="profile" element={<ProfilePage />} />
       </Route>
     </Routes>
   );

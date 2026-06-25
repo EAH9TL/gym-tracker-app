@@ -29,8 +29,10 @@ export interface WorkoutLog {
   difficulty?: Difficulty | null;
 }
 
-export type WorkoutLogInsert = Omit<WorkoutLog, 'id' | 'created_at' | 'user_id'>;
-
+export type WorkoutLogInsert = Omit<
+  WorkoutLog,
+  'id' | 'created_at' | 'user_id'
+>;
 
 // Interfaz para cuando queramos recuperar logs con la info del ejercicio
 export interface WorkoutLogWithExercise extends WorkoutLog {

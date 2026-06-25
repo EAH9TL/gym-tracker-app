@@ -1,0 +1,6 @@
+# Ignorar carpetas de dependencias y de build
+node_modules
+dist
+
+# Ignorar archivos de entorno local
+.env.local
