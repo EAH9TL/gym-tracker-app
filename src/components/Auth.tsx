@@ -1,24 +1,33 @@
-// src/components/Auth.tsx
 import React, { useState } from 'react';
 import { supabase } from '../supabaseClient';
-import Swal from 'sweetalert2'; // <-- 1. IMPORTAR sweetalert2
+import Swal from 'sweetalert2';
 
 export default function Auth() {
   const [loading, setLoading] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isRegistering, setIsRegistering] = useState(false);
-  // const [message, setMessage] = useState(''); // <-- 2. ELIMINAMOS el estado message
 
   const handleAuth = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
 
     if (isRegistering) {
+      if(password.length < 8){
+        Swal.fire({
+      title: 'Contraseña poco segura',
+      text: 'La contraseña debe tener al menos 8 caracteres para proteger tu cuenta.',
+      icon: 'warning',
+      background: '#1e293b',
+      color: '#e2e8f0',
+      confirmButtonColor: '#10b981'
+    });
+    setLoading(false);
+    return;
+      }
       // --- Lógica de Registro ---
       const { error } = await supabase.auth.signUp({ email, password });
       if (error) {
-        // 3. REEMPLAZAMOS setMessage por Swal.fire para errores
         Swal.fire({
           title: 'Error de registro',
           text: error.message,
@@ -28,7 +37,6 @@ export default function Auth() {
           confirmButtonColor: '#10b981' // emerald-500
         });
       } else {
-        // 4. REEMPLAZAMOS setMessage por Swal.fire para éxito
         Swal.fire({
           title: '¡Registro exitoso!',
           text: 'Hemos enviado un enlace de confirmación a tu correo. Por favor, haz clic en él para activar tu cuenta.',
@@ -53,7 +61,6 @@ export default function Auth() {
         });
       }
       // Si el login es exitoso, el onAuthStateChange del Layout se encargará de redirigir.
-      // No es necesario mostrar un Swal de éxito aquí.
     }
     setLoading(false);
   };
@@ -97,10 +104,7 @@ export default function Auth() {
             {loading ? 'Procesando...' : isRegistering ? 'Registrarse' : 'Entrar'}
           </button>
         </form>
-        
-        {/* 5. ELIMINAMOS el párrafo que mostraba el mensaje */}
-        {/* {message && <p className="mt-4 text-center text-sm text-amber-400">{message}</p>} */}
-        
+    
         <button
           onClick={() => setIsRegistering(!isRegistering)}
           className="mt-6 w-full text-center text-xs text-slate-400 hover:text-slate-200 transition underline"
