@@ -24,11 +24,11 @@ const UserIcon = (props: React.SVGProps<SVGSVGElement>) => (
 // MODIFICADO para uso en móvil (columna) y escritorio (fila)
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const NavItem = ({ to, icon: Icon, children, isMobile = false }: { to: string; icon: React.FC<any>; children: React.ReactNode; isMobile?: boolean }) => {
-    const baseClasses = "transition-colors";
-    const activeClasses = "text-emerald-400";
-    const inactiveClasses = "text-slate-500 hover:text-slate-300";
+    const baseClasses = "transition-all duration-200";
+    const activeClasses = "text-emerald-300";
+    const inactiveClasses = "text-slate-400 hover:text-slate-200";
 
-    const mobileLayout = "flex-1 flex flex-col items-center justify-center gap-1 h-full";
+    const mobileLayout = "flex-1 flex flex-col items-center justify-center gap-1 h-full relative rounded-[20px]";
     const desktopLayout = "flex items-center gap-2 text-sm font-bold p-2 rounded-lg";
     
     return (
@@ -105,8 +105,9 @@ const Layout = () => {
       </main>
 
       {/* --- BARRA DE NAVEGACIÓN INFERIOR PARA MÓVIL --- */}
-        <nav className="md:hidden fixed bottom-3 left-3 right-3 z-50 h-16 rounded-[28px] border border-slate-700/70 bg-slate-900/85 shadow-[0_10px_30px_rgba(0,0,0,0.35)] backdrop-blur-xl overflow-hidden">
-          <div className="flex items-center justify-around h-full">
+        <nav className="md:hidden fixed bottom-5 left-3 right-3 z-50 h-16 rounded-[30px] border border-white/15 bg-white/10 shadow-[0_8px_30px_rgba(0,0,0,0.35),inset_0_1px_0_rgba(255,255,255,0.16)] backdrop-blur-[22px] overflow-hidden">
+          <div className="absolute inset-0 bg-white/5" />
+          <div className="relative flex items-center justify-around h-full px-1">
           <NavItem to="/" icon={DumbbellIcon} isMobile={true}>Registrar</NavItem>
           <NavItem to="/kpis" icon={ChartIcon} isMobile={true}>Progreso</NavItem>
           {profile?.is_admin && (
